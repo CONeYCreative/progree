@@ -2,6 +2,7 @@
   <div
     class="markdown pr-2"
     v-html="markdown"
+    @drag="$emit('drag', $event)"
   />
 </template>
 

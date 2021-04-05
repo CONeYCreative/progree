@@ -25,7 +25,27 @@ export const actions = {
     }
   },
   async login (context, { email, password }) {
-    await this.$fireauth.signInWithEmailAndPassword(email, password)
+    const result = await this.$fireauth.signInWithEmailAndPassword(email, password).catch(e => ({ error: e }))
+    if ('error' in result && result.error) {
+      if (result.error.code === 'auth/too-many-requests') {
+        throw {
+          statusCode: 'ログインできませんでした',
+          message: '何度もパスワードを間違えています。パスワードを確認してください。'
+        }
+      }
+      if (result.error.code === 'auth/wrong-password') {
+        throw {
+          statusCode: 'ログインできませんでした',
+          message: 'パスワードが間違っています。'
+        }
+      }
+      if (result.error.code === 'auth/user-not-found') {
+        throw {
+          statusCode: 'ログインできませんでした',
+          message: 'ログインIDが間違っています。'
+        }
+      }
+    }
   },
   async logout () {
     await this.$fireauth.signOut()

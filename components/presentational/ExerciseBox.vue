@@ -23,7 +23,7 @@
       :max-width="isMobile ? '100%' : '60%'"
       flat
     >
-      <exercise-editor-box
+      <editable-exercise-box
         :code="code"
         :last-code="lastCode"
         @answer="$emit('answer', $event)"
@@ -37,6 +37,19 @@
       :width="isMobile ? '100%' : '60%'"
       :max-width="isMobile ? '100%' : '60%'"
     >
+      <v-card-title
+        v-if="/(draganddrop|choices)/.test(question.type)"
+        class="body-1 primary--text font-weight-bold"
+        v-text="text.options"
+      />
+
+      <draggable-exercise-box
+        v-if="question.type === 'draganddrop'"
+        :question="question"
+        :options="options"
+        @submit="$event => { answer = $event }"
+      />
+
       <v-card-text
         v-if="!!conditions.length"
         class="ma-0 pa-3"
@@ -98,11 +111,13 @@
 
 <script>
 import Markdown from '~/components/presentational/Markdown'
-import ExerciseEditorBox from '~/components/presentational/ExerciseEditorBox'
+import EditableExerciseBox from '~/components/presentational/EditableExerciseBox'
+import DraggableExerciseBox from '~/components/presentational/DraggableExerciseBox'
 export default {
   components: {
     Markdown,
-    ExerciseEditorBox
+    EditableExerciseBox,
+    DraggableExerciseBox
   },
   props: {
     question: {
@@ -127,6 +142,7 @@ export default {
       text: {
         title: 'Question',
         submit: '回答する',
+        options: '選択肢',
         choices: '選択肢の中から正しいものを選択してください！',
         writing: '適切な答えを入力してください！',
         editing: 'エディタ内のコードを訂正してください！',

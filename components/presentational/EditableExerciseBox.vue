@@ -44,11 +44,14 @@
       dark
     >
       <v-card-title
-        class="body-1 font-weight-bold"
+        class="body-2 pt-2 pb-1 font-weight-bold"
         v-text="text.result"
       />
-      <v-divider class="mx-2 mb-4" />
-      <v-card-text v-html="sanitizing(resultText)" />
+      <v-divider class="ma-2 mt-0" />
+      <v-card-text
+        class="py-0"
+        v-html="sanitizing(resultText)"
+      />
       <v-card-actions class="pa-2">
         <v-spacer />
 
