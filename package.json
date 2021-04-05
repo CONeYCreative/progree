@@ -1,0 +1,28 @@
+{
+  "name": "progree",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.13.1",
+    "@nuxtjs/pwa": "^3.3.5",
+    "brace": "^0.11.1",
+    "core-js": "^3.8.3",
+    "firebase": "^8.2.7",
+    "highlight.js": "^10.6.0",
+    "marked": "^2.0.1",
+    "nuxt": "^2.14.12",
+    "vuedraggable": "^2.24.3"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.2",
+    "@mdi/font": "^5.9.55",
+    "@nuxtjs/vuetify": "^1.11.3",
+    "material-design-icons-iconfont": "^6.1.0"
+  }
+}
