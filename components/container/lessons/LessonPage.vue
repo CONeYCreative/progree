@@ -126,6 +126,13 @@ export default {
     }
   },
   async fetch () {
+    if (this.user.isAdmin) {
+      this.navMenuItems.push({
+        icon: 'person',
+        text: '管理者ページ',
+        location: '/admin/'
+      })
+    }
     const lessonId = this.$route.params.lessonId
     this.lesson = this.$store.getters['data/theLesson'](lessonId)
     this.progress = this.$store.getters['data/theProgress'](lessonId) || {}

@@ -1,31 +1,41 @@
 <template>
   <page-wrapper>
     <app-bar
-      :title="appbar.title"
+      :title="text.progree"
       :user="user"
-      :navMenuItems="appbar.navMenuItems"
+      :navMenuItems="navMenuItems"
     />
 
     <scroll-box>
       <v-card-title
         class="primary--text font-weight-bold px-6"
-        v-text="'取り組み中のレッスン'"
+        v-text="text.recent"
       />
 
-      <lessons-list :lessons="openedLessons" />
+      <lessons-list
+        :lessons="openedLessons"
+        :progress="progress"
+        close
+        @click:start="$router.push({ path: `/lessons/${$event.id}/` })"
+        @click:close="closeLesson($event)"
+      />
 
       <v-card-title
         class="primary--text font-weight-bold px-6"
-        v-text="'レッスン一覧'"
+        v-text="text.list"
       />
 
-      <lessons-list :lessons="lessons" />
+      <lessons-list
+        :lessons="lessons"
+        :progress="progress"
+        @click:start="$router.push({ path: `/lessons/${$event.id}/` })"
+      />
     </scroll-box>
   </page-wrapper>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import PageWrapper from '~/components/presentational/PageWrapper'
 import AppBar from '~/components/presentational/AppBar'
 import ScrollBox from '~/components/presentational/ScrollBox'
@@ -39,21 +49,43 @@ export default {
   },
   data () {
     return {
-      appbar: {
-        title: 'progree',
-        navMenuItems: [
-          {
-            icon: 'logout',
-            text: 'ログアウト',
-            location: '/logout/'
-          }
-        ]
-      }
+      text: {
+        progree: 'progree',
+        recent: '最近のレッスン',
+        list: 'レッスン一覧'
+      },
+      navMenuItems: [
+        {
+          icon: 'logout',
+          text: 'ログアウト',
+          location: '/logout/'
+        }
+      ]
     }
+  },
+  fetch () {
+    if (this.user.isAdmin) {
+      this.navMenuItems.push({
+        icon: 'person',
+        text: '管理者ページ',
+        location: '/admin/'
+      })
+    }
+  },
+  methods: {
+    async closeLesson (lesson) {
+      await this.setProgress({
+        id: lesson.id,
+        merge: true,
+        isOpen: false,
+        isDoing: true
+      })
+    },
+    ...mapActions('data', ['setProgress'])
   },
   computed: {
     ...mapGetters('auth', ['user']),
-    ...mapGetters('data', ['lessons', 'openedLessons'])
+    ...mapGetters('data', ['lessons', 'progress', 'openedLessons'])
   }
 }
 </script>

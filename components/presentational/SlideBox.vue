@@ -46,7 +46,7 @@
 
       <v-carousel-item
         v-for="slide of lesson.slides"
-        :key="slide.title"
+        :key="slide.imageUrl"
         :aspect-ratio="2"
         :src="slide.imageUrl"
         eager

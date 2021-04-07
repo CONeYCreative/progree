@@ -17,6 +17,7 @@ export default {
   ],
   plugins: [
     '~/plugins/axios',
+    '~/plugins/helpers',
     '~/plugins/firebase'
   ],
   components: true,
