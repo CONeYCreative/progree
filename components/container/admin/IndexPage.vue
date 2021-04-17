@@ -16,7 +16,7 @@
         <v-card
           v-for="item of mainItems"
           :key="item.text"
-          class="d-flex justify-center align-center"
+          class="d-flex justify-center align-center mx-3"
           color="primary"
           height="90"
           width="280"
@@ -25,7 +25,7 @@
         >
           <v-icon
             class="mx-3"
-            v-text="icons.edit"
+            v-text="item.icon"
           />
           <v-card-title
             class="font-weight-bold px-6"
@@ -50,9 +50,6 @@ export default {
   },
   data () {
     return {
-      icons: {
-        edit: 'edit'
-      },
       text: {
         progree: 'progree',
         title: '管理者ページ'
@@ -60,7 +57,13 @@ export default {
       mainItems: [
         {
           text: 'レッスン作成・編集',
-          path: '/admin/lesson_create/'
+          path: '/admin/lesson_create/',
+          icon: 'edit'
+        },
+        {
+          text: '問題作成・編集',
+          path: '/admin/question_create/',
+          icon: 'edit'
         }
       ],
       navMenuItems: [

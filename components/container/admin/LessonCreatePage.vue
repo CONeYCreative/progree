@@ -413,7 +413,7 @@ export default {
       for (const slide of this.form.slides) {
         if (slide.file) {
           const imageUrl = await this.uploadFile(slide.file)
-          slides.push({ id: slide.id, imageUrl })
+          slides.push({ ...slide, imageUrl, file: null })
         } else {
           slides.push({ ...slide })
         }
@@ -429,19 +429,23 @@ export default {
         const image = new Image()
         const reader = new FileReader()
         const canvas = document.createElement('canvas')
-        image.height = 640
-        image.width = 1280
+        image.height = 1280
+        image.width = 2560
         canvas.width = image.width
         canvas.height = image.height
         reader.onload = () => { image.src = reader.result }
         image.onload = () => {
-          canvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height)
-          const dataUrl = canvas.toDataURL('image/jpeg')
-          const binary = atob(dataUrl.split(',')[1])
-          const data = new Uint8Array(binary.length)
-          Array(binary.length).fill().forEach((e, i) => { data[i] = binary.charCodeAt(i) })
-          const file = new File([data], `${Date.now()}.jpg`, { type: 'image/jpeg' })
-          resolve({ file, url: dataUrl })
+          if (file.name.split('.').pop() === 'svg') {
+            resolve({ file, url: image.src })
+          } else {
+            canvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height)
+            const dataUrl = canvas.toDataURL('image/jpeg')
+            const binary = atob(dataUrl.split(',')[1])
+            const data = new Uint8Array(binary.length)
+            Array(binary.length).fill().forEach((e, i) => { data[i] = binary.charCodeAt(i) })
+            const resizeFile = new File([data], `${Date.now()}.jpg`, { type: 'image/jpeg' })
+            resolve({ file: resizeFile, url: dataUrl })
+          }
         }
         reader.readAsDataURL(file)
       })

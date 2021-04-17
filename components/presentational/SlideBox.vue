@@ -1,8 +1,12 @@
 <template>
-  <v-card>
+  <v-card
+    class="ma-auto"
+    max-width="1100"
+  >
     <v-carousel
+      class="slide-box"
       v-model="model"
-      style="height: auto;"
+      id="slideBox"
       :continuous="false"
       hide-delimiter-background
       hide-delimiters
@@ -47,7 +51,6 @@
       <v-carousel-item
         v-for="(slide, i) of lesson.slides"
         :key="i"
-        :aspect-ratio="2"
         :src="slide.imageUrl"
         :ripple="false"
         eager
@@ -88,6 +91,13 @@ export default {
       })
     }
   },
+  mounted () {
+    const slideBox = document.getElementById('slideBox')
+    slideBox.style.width = '100%'
+    setTimeout(() => {
+      slideBox.style.height = `${slideBox.clientWidth / 2}px`
+    }, 100)
+  },
   watch: {
     value () {
       this.$fetch()
@@ -104,6 +114,9 @@ export default {
 </script>
 
 <style>
+.slide-box {
+  max-width: 1100px;
+}
 .slide-box .v-image {
   height: auto !important;
 }

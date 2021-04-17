@@ -49,10 +49,11 @@ export default (context, inject) => {
     $format: datetimeToFormatString,
     $relative: datetimeToRelativeTimeString
   })
-
   inject('html', {
     $sanitize
   })
-
+  // uuid作成
   inject('uuid', uuid)
+  // エラー処理
+  inject('throw', error => context.error(error))
 }

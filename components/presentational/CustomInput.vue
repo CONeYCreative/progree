@@ -85,6 +85,10 @@ export default {
       type: String,
       default: null
     },
+    backgroundColor: {
+      type: String,
+      default: null
+    },
     counter: {
       type: Number,
       default: null
@@ -124,6 +128,22 @@ export default {
     hideInput: {
       type: Boolean,
       default: false
+    },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    dense: {
+      type: Boolean,
+      default: false
+    },
+    solo: {
+      type: Boolean,
+      default: false
+    },
+    flat: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -147,7 +167,12 @@ export default {
         'multiple',
         'accept',
         'hideInput',
-        'prependIcon'
+        'prependIcon',
+        'readonly',
+        'dense',
+        'solo',
+        'backgroundColor',
+        'flat'
       ],
       bindings: {}
     }

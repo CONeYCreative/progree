@@ -1,11 +1,11 @@
 <template>
-  <lesson-create-page />
+  <question-create-page />
 </template>
 
 <script>
-import LessonCreatePage from '~/components/container/admin/LessonCreatePage'
+import QuestionCreatePage from '~/components/container/admin/QuestionCreatePage'
 export default {
-  components: { LessonCreatePage },
+  components: { QuestionCreatePage },
   async middleware (context) {
     // 認証確認
     if (!context.store.getters['auth/isAuthenticated']) {
@@ -16,7 +16,7 @@ export default {
   },
   head () {
     return {
-      title: 'レッスン作成・編集'
+      title: '問題作成・編集'
     }
   }
 }

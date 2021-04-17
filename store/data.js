@@ -41,7 +41,7 @@ export const actions = {
   async fetchLessons (context) {
     if (!context.getters.isLessonsExisted) {
       const ref = this.$firestore.collection(`/versions/${VERSION}/lessons/`)
-      const snap = await ref.orderBy('rank').get()
+      const snap = await ref.where('rank', '<', 999).orderBy('rank').get()
       for (const doc of snap.docs) {
         context.commit('setLesson', { id: doc.id, ...doc.data() })
       }
