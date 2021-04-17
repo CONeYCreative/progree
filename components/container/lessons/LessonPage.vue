@@ -158,18 +158,24 @@ export default {
           }
         })
       })
-      menuItems.push(
-        {
-          divider: true,
-          text: 'Sample Code',
-          location: { path: `/lessons/${lesson.id}/code/` }
-        },
-        {
-          divider: true,
-          text: 'Exercise',
-          location: { path: `/lessons/${lesson.id}/exercise/` }
-        }
-      )
+      if (lesson.sample.code || lesson.sample.description) {
+        menuItems.push(
+          {
+            divider: true,
+            text: 'サンプルコード',
+            location: { path: `/lessons/${lesson.id}/code/` }
+          }
+        )
+      }
+      if (Object.keys(lesson.exercises).length) {
+        menuItems.push(
+          {
+            divider: true,
+            text: 'エキササイズ',
+            location: { path: `/lessons/${lesson.id}/exercise/` }
+          }
+        )
+      }
       return menuItems
     },
     ...mapActions('data', ['setProgress'])

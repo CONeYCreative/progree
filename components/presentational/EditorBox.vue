@@ -60,7 +60,10 @@
         max-height="430"
         max-width="320"
       >
-        <v-card dark>
+        <v-card
+          class="pb-3"
+          dark
+        >
           <v-card-title
             class="body-2 pt-2 pb-1 font-weight-bold"
             v-text="text.result"

@@ -7,7 +7,7 @@
     :prev-button-disabled="!lesson.prevLessonId"
     :next-button-disabled="model.slide !== lesson.slides.length - 1"
     @click:prev="$router.push({ path: `/lessons/${lesson.prevLessonId}/` })"
-    @click:next="$router.push({ path: `/lessons/${lesson.id}/code/` })"
+    @click:next="$router.push({ path: nextPath })"
   >
     <slide-box
       :lesson="lesson"
@@ -34,13 +34,23 @@ export default {
         headIcon: 'flash_on',
         prev: '前のレッスンに戻る',
         next: 'サンプルコードへ'
-      }
+      },
+      nextPath: null
     }
   },
   fetch () {
     const lessonId = this.$route.params.lessonId
     this.lesson = this.$store.getters['data/theLesson'](lessonId)
     this.model.slide = Number(this.$route.hash.replace('#slide', '')) || 0
+    this.nextPath = `/lessons/${this.lesson.id}/code/`
+    if (!this.lesson.sample.code && !this.lesson.sample.description) {
+      this.nextPath = `/lessons/${this.lesson.id}/exercise/`
+      this.text.next = 'エキササイズへ'
+      if (!Object.keys(this.lesson.exercises).length) {
+        this.nextPath = `/lessons/${this.lesson.prevLessonId}/`
+        this.text.next = '次のレッスンへ'
+      }
+    }
   },
   computed: {
     ...mapGetters('data', ['theLesson'])

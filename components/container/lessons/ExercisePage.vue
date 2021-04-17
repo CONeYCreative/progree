@@ -74,7 +74,8 @@ export default {
     this.clearedQuestionNumber = (this.exercise.progress.clearedIds.length || 0) + 1
     this.lastCode = (this.exercise.progress.codes ? this.exercise.progress.codes[this.question.id] : '') || ''
     this.isClear = this.exercise.progress.isClear
-    this.text.exercise = `Exercise ${this.exercise.id.replace(/[^\d]/g, '')} 〜${this.exercise.title}〜`
+    const exerciseIndex = (this.exercise.id.match(/\d+/) || [])[0] || '?'
+    this.text.exercise = `Exercise ${exerciseIndex} 〜${this.exercise.title}〜`
   },
   methods: {
     /* 挑戦すべきエキササイズを取得する */

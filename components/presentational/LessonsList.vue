@@ -33,13 +33,13 @@
       @click="$emit('click:lesson', lesson)"
     >
       <v-btn
-        absolute
+        v-if="close"
         style="top: 6px; right: 10px;"
+        absolute
         icon
         @click="$emit('click:close', lesson)"
       >
         <v-icon
-          v-if="close"
           v-text="icons.close"
         />
       </v-btn>

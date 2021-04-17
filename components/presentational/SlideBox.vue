@@ -45,11 +45,13 @@
       </template>
 
       <v-carousel-item
-        v-for="slide of lesson.slides"
-        :key="slide.imageUrl"
+        v-for="(slide, i) of lesson.slides"
+        :key="i"
         :aspect-ratio="2"
         :src="slide.imageUrl"
+        :ripple="false"
         eager
+        @click="$emit('click:slide', slide)"
       />
     </v-carousel>
   </v-card>
@@ -76,16 +78,19 @@ export default {
       }
     }
   },
+  fetch () {
+    if (this.value !== this.model) {
+      const vector = Number(this.value > this.model) || -1
+      const size = Math.abs(this.value - this.model)
+      const array = [...Array(size)]
+      array.forEach((e, i) => {
+        setTimeout(() => { this.model += vector }, 100 * i)
+      })
+    }
+  },
   watch: {
-    value (value) {
-      if (value !== this.model) {
-        const vector = Number(value > this.model) || -1
-        const size = Math.abs(value - this.model)
-        const array = [...Array(size)]
-        array.forEach((e, i) => {
-          setTimeout(() => { this.model += vector }, 100 * i)
-        })
-      }
+    value () {
+      this.$fetch()
     },
     model (model) {
       this.$emit('input', model)

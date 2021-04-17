@@ -1,4 +1,11 @@
 export default (context, inject) => {
+  const $sanitize = string => {
+    string = string.replace(/&/g, '&amp;')
+    string = string.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    string = string.replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+    return string
+  }
+
   const datetimeToFormatString = (date, format = 'yyyy/M/d H:mm') => {
     format = format.replace(/yyyy/g, date.getFullYear())
     format = format.replace(/MM/g, ('0' + (date.getMonth() + 1)).slice(-2))
@@ -42,5 +49,10 @@ export default (context, inject) => {
     $format: datetimeToFormatString,
     $relative: datetimeToRelativeTimeString
   })
+
+  inject('html', {
+    $sanitize
+  })
+
   inject('uuid', uuid)
 }

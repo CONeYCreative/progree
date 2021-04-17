@@ -16,6 +16,11 @@ export default {
       default: null
     }
   },
+  data () {
+    return {
+      markdown: null
+    }
+  },
   created () {
     marked.setOptions({
       breaks: true,
@@ -25,9 +30,17 @@ export default {
       }
     })
   },
-  computed: {
-    markdown () {
-      return marked(this.text.replace(/\\\\n/g, '\n'))
+  fetch() {
+    this.render(this.text)
+  },
+  methods: {
+    render (text) {
+      this.markdown = marked((text || '').replace(/\\\\n/g, '\n'))
+    }
+  },
+  watch: {
+    text (text) {
+      this.render(text)
     }
   }
 }
