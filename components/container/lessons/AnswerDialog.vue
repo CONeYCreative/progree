@@ -206,7 +206,7 @@ export default {
   fetch () {
     if (this.question.type === 'choices') {
       this.text.help = '解答'
-      this.text.helpMarkdown = `${this.question.data.find(item => `${item.code}` === this.question.answerKey)?.text}`
+      this.text.helpMarkdown = `${this.question.data.find(item => `${item.id}` === this.question.answerKey)?.text}`
     } else {
       this.text.help = '文字の打ち間違えなどに気をつけて、<br>もう一度トライしてみよう！'
       this.text.helpMarkdown = null

@@ -78,12 +78,12 @@
       >
         <v-card
           v-for="option of options"
-          :key="option.code"
+          :key="option.id"
           class="px-3 mb-3"
           light
           flat
         >
-          <v-radio :value="option.code">
+          <v-radio :value="option.id">
             <template #label>
               <markdown
                 class="markdown--options"
@@ -124,10 +124,6 @@ export default {
       type: Object,
       default: () => ({})
     },
-    quota: {
-      type: Number,
-      default: null
-    },
     clearedQuestionNumber: {
       type: Number,
       default: null
@@ -159,6 +155,7 @@ export default {
     this.text.title += ` ${this.clearedQuestionNumber}`
     this.options = this.question.data.filter(e => e.type === 'option')
     this.options = this.shuffleArray(this.options)
+    console.log(this.options)
     this.conditions = this.question.data.filter(e => e.type === 'condition')
     this.code = this.question.data.find(e => e.type === 'code')?.text || ''
   },

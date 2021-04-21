@@ -16,9 +16,9 @@
       >
         <markdown
           v-for="option of options"
-          :key="option.code"
+          :key="option.id"
           class="draggables__item d-inline-block ma-6 mb-0"
-          :class="{ [`draggable-item-${option.code}`]: true }"
+          :class="{ [`draggable-item-${option.id}`]: true }"
           :text="option.text"
         />
 
@@ -128,18 +128,18 @@ export default {
       const isDroppable = /droppable-item-\d+/.test(dropped.id)
       // drag しているのはすでに drop された item か？
       const isDropped = /dropped-item-\d+/.test(dragged.id)
-      // drag されている item の code
-      const draggedItemCode = [...dragged.classList].find(val => /draggable-item-\d+/.test(val))?.replace('draggable-item-', '')
+      // drag されている item の id
+      const draggedItemId = [...dragged.classList].find(val => /draggable-item-\d+/.test(val))?.replace('draggable-item-', '')
       if (isDroppable && !isDropped) {
         // 枠外のアイテムが枠内にドロップ
-        this.result[draggedItemCode] = dropped.id.replace('droppable-item-', '')
+        this.result[draggedItemId] = dropped.id.replace('droppable-item-', '')
         dropped.classList.remove('droppables__item--mouseover')
         this.droppables[dropped.id] = dropped.cloneNode(true)
         dragged.id = dropped.id.replace('droppable', 'dropped')
         dropped.replaceWith(dragged)
       } else if (isDroppable && isDropped) {
         // 枠内のアイテムが別の枠内にドロップ
-        this.result[draggedItemCode] = dropped.id.replace('droppable-item-', '')
+        this.result[draggedItemId] = dropped.id.replace('droppable-item-', '')
         const clonedDragged = dragged.cloneNode(true)
         const droppable = this.droppables[dragged.id.replace('dropped', 'droppable')]
         droppable.addEventListener('dragover', this.mouseOverTheDroppable)
@@ -151,7 +151,7 @@ export default {
         dropped.replaceWith(clonedDragged)
       } else if (!isDroppable && isDropped) {
         // 枠内のアイテムが枠外にドロップ
-        this.result[draggedItemCode] = null
+        this.result[draggedItemId] = null
         const clonedDragged = dragged.cloneNode(true)
         clonedDragged.id = null
         const droppable = this.droppables[dragged.id.replace('dropped', 'droppable')]

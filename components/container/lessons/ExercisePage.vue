@@ -21,6 +21,13 @@
       @answer="answerTheQuestion"
     />
 
+    <v-btn
+      v-if="user.isAdmin"
+      text
+      @click="$router.push({ path: '/admin/question_create/', query: { lesson: lesson.id, exercise: exercise.id, question: question.id } })"
+      v-text="'このエキササイズを編集'"
+    />
+
     <answer-dialog
       v-model="dialogs.answer"
       :loading="loading"

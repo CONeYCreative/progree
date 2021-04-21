@@ -309,8 +309,8 @@ export default {
     async selectSlide (type) {
       this.loading.slideFileUpload = true
       const slide = this.selectedSlide
-      this.form.slides = this.form.slides.map(item => {
-        return !!item.id ? item : { ...item, id: `${Date.now()}` }
+      this.form.slides = this.form.slides.map((item, i) => {
+        return !!item.id ? item : { ...item, id: `${Date.now() + i * 100}` }
       })
       if (type === 'title') {
         const title = window.prompt('このスライドのタイトルを入力してください。入力がない場合、キャンセルされます。')

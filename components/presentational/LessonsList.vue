@@ -43,6 +43,7 @@
           v-text="icons.close"
         />
       </v-btn>
+
       <div class="d-flex">
         <v-icon
           color="accent"
@@ -179,6 +180,7 @@ export default {
     }
   },
   fetch () {
+    console.log(this.lessons)
     this.progress.forEach(p => {
       this.progressObject[p.id] = p
     })

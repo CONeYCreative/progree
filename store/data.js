@@ -16,7 +16,11 @@ export const getters = {
   progress: state => state.progress,
   isProgressExisted: state => !!state.progress.length,
   theProgress: state => id => state.progress.find(progress => id === progress.id),
-  openedLessons: state => state.progress.filter(progress => progress.isOpen).map(progress => state.lessons.find(lesson => progress.id === lesson.id))
+  openedLessons: state => {
+    const openIds = state.progress.filter(progress => progress.isOpen)
+    const openLessons = openIds.map(progress => state.lessons.find(lesson => progress.id === lesson.id))
+    return openLessons.filter(lesson => lesson && lesson.id && lesson.rank < 999)
+  }
 }
 
 export const mutations = {
@@ -24,6 +28,7 @@ export const mutations = {
   setLesson (state, lesson) {
     state.lessons = state.lessons.filter(l => lesson.id !== l.id)
     state.lessons.push(lesson)
+    state.lessons.sort((a, b) => a.rank > b.rank ? 1 : -1)
   },
   progress (state, object) { state.progress = object || [] },
   setProgress (state, progress) {
@@ -41,16 +46,16 @@ export const actions = {
   async fetchLessons (context) {
     if (!context.getters.isLessonsExisted) {
       const ref = this.$firestore.collection(`/versions/${VERSION}/lessons/`)
-      const snap = await ref.where('rank', '<', 999).orderBy('rank').get()
+      const snap = await ref.orderBy('rank').get()
       for (const doc of snap.docs) {
         context.commit('setLesson', { id: doc.id, ...doc.data() })
       }
     }
   },
   async setLessons (context, payload) {
-    const { id, ...request } = payload
+    const { id, merge = false, ...request } = payload
     const ref = this.$firestore.doc(`/versions/${VERSION}/lessons/${id}/`)
-    await ref.set(request, { merge: false })
+    await ref.set(request, { merge })
     const doc = await ref.get()
     if (doc.exists) {
       context.commit('setLesson', { id: doc.id, ...doc.data() })

@@ -26,7 +26,7 @@
       />
 
       <lessons-list
-        :lessons="lessons"
+        :lessons="lessons.filter(lesson => lesson.rank < 999)"
         :progress="progress"
         @click:start="$router.push({ path: `/lessons/${$event.id}/` })"
       />

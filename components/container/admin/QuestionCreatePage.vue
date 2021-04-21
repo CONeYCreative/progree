@@ -6,118 +6,166 @@
       :navMenuItems="navMenuItems"
     />
 
-    <scroll-box v-if="lesson">
+    <scroll-box v-if="lesson && exercise">
       <div class="d-flex align-center px-6">
         <v-icon
           color="accent"
           v-text="icons.edit"
         />
+
         <v-card-title
           class="primary--text font-weight-bold"
           v-text="text.title"
         />
+
         <v-btn
           text
-          v-text="'レッスンを再選択'"
+          v-text="'レッスン・エキササイズを再選択'"
           @click="clearLesson(false)"
         />
       </div>
 
+      <div
+        class="body-1 primary--text font-weight-bold px-6"
+        v-text="`${lesson.title} / ${exercise.id} ${exercise.title}`"
+      />
+
       <v-form
-        class="pa-6 d-flex flex-column"
-        ref="form"
+        class="pa-6"
+        ref="questionForm"
         @submit.prevent
-        :disabled="loading.form"
+        :disabled="loading"
       >
-        <custom-input
-          v-model="exerciseId"
-          class="pa-3"
-          input-type="select"
-          label="エキササイズ"
-          item-value="id"
-          item-text="text"
-          :messages="['問題を追加・編集するエキササイズを選択します']"
-          :items="exercises"
-          :rules="[v => !!v || '選択してください']"
-          @change="selectExercise"
-        />
-
-        <div
-          class="caption text--secondary px-6"
-          v-if="exercise && exercise.title"
-          v-text="`タイトル：${exercise.title}`"
-        />
-
-        <div
-          class="caption text--secondary px-6"
-          v-if="exercise && exercise.quota"
-          v-text="`ノルマ：${exercise.quota}`"
-        />
-
-        <v-divider class="my-6" />
-
-        <custom-input
-          class="py-3"
-          input-type="textarea"
-          v-model="questionForm.text"
-          label="問題文"
-          :messages="['マークダウンで入力してください']"
-          :rules="[v => !!v || '入力してください']"
-          :counter="1024"
-          @input="questionForm._text = (questionForm.text || '').replace(/\n/g, '\\\\n')"
-        />
-
-        <markdown
-          v-if="questionForm.text"
-          class="pa-4 mb-6"
-          style="border-radius: 4px; border: 1px solid #419eb2;"
-          :text="questionForm._text"
-        />
-
         <v-divider class="my-6" />
 
         <custom-input
           class="pa-3"
           input-type="select"
-          v-model="exerciseForm.type"
+          v-model="question.type"
           label="問題タイプ"
-          item-value="id"
-          item-text="title"
           :messages="['問題タイプを設定します']"
+          :rules="[v => !!v || '選択してください']"
           :items="types"
         />
 
         <custom-input
-          v-if="exerciseForm.type && levels[exerciseForm.type]"
+          v-if="question.type && /(draganddrop|editing|coding)/.test(question.type)"
           class="pa-3"
           input-type="select"
-          v-model="exerciseForm.level"
+          v-model="question.level"
           label="レベル"
           :messages="['問題のレベルを設定します']"
-          :items="levels[exerciseForm.type]"
+          :rules="[v => !!v || '選択してください']"
+          :items="levels"
         />
 
         <v-divider class="my-6" />
 
         <custom-input
           class="pa-3"
-          v-model="questionForm.answerKey"
-          label="解答"
-          :messages="['改行はありません']"
+          input-type="textarea"
+          v-model="question.text"
+          label="問題文"
+          :messages="['マークダウンで入力してください']"
           :rules="[v => !!v || '入力してください']"
-          @input="selectExercise"
+          :counter="1024"
         />
 
-        <div v-if="exerciseForm.type && /(draganddrop|editing|coding)/.test(exerciseForm.type)">
-          <v-subheader
-            v-text="'コード解答例'"
+        <custom-input
+          class="pa-3"
+          v-model="question.answerKey"
+          label="解答"
+          :rules="[v => !!v || '入力してください']"
+        />
+
+        <div v-if="question.type && /(draganddrop|editing|coding)/.test(question.type)">
+          <div
+            class="body-2 text--secondary pa-4 pb-0"
+            v-text="'コード例'"
           />
 
           <code-input
-            class="py-3"
-            :code="questionForm.answerKeyCode"
+            class="pa-3"
+            :code="question.answerKeyCode"
             message="「保存して実行」で結果を確かめてください。これをしないと変更が反映されません。"
-            @change="$event => { questionForm.answerKeyCode = $event }"
+            @change="$event => { question.answerKeyCode = $event }"
+          />
+        </div>
+
+        <div v-if="question.type">
+          <v-divider class="my-6" />
+
+          <div
+            v-for="dataItem, i of question.data"
+            :key="i"
+            class="d-flex pa-3"
+          >
+            <custom-input
+              v-model="dataItem.type"
+              input-type="select"
+              class="pa-2"
+              style="max-width: 160px;"
+              label="タイプ"
+              :rules="[v => !!v || '選択してください']"
+              :items="dataItemTypes[question.type]"
+            />
+
+            <custom-input
+              v-if="dataItem.type === 'option'"
+              v-model="dataItem.id"
+              class="pa-2"
+              style="max-width: 160px;"
+              label="選択肢ID"
+              :rules="[v => !!v || '入力してください']"
+            />
+
+            <custom-input
+              v-model="dataItem.text"
+              class="pa-2"
+              style="width: 100%;"
+              label="データコンテンツ"
+              input-type="textarea"
+              :rules="[v => !!v || '入力してください']"
+            />
+
+            <v-btn
+              icon
+              @click="() => { question.data = question.data.filter(item => item !== dataItem) }"
+            >
+              <v-icon v-text="'close'" />
+            </v-btn>
+          </div>
+
+          <v-btn
+            class="d-flex align-center"
+            text
+            @click="question.data.push({})"
+          >
+            <v-icon>add</v-icon>
+            <span>固有データを追加</span>
+          </v-btn>
+
+          <v-divider class="my-6" />
+
+        </div>
+
+        <v-card-actions>
+          <v-spacer />
+
+          <v-btn
+            class="font-weight-bold"
+            color="accent"
+            :loading="loading"
+            @click="confirm"
+            v-text="'確認'"
+          />
+        </v-card-actions>
+
+        <div v-if="confirmed">
+          <v-divider class="my-6" />
+
+          <exercise-box
+            :question="question"
           />
         </div>
 
@@ -129,132 +177,79 @@
           <v-btn
             class="font-weight-bold"
             color="accent"
-            :loading="loading.form"
-            v-text="'保存'"
+            :loading="loading"
+            @click="submit"
+            v-text="'追加・編集を完了して保存'"
           />
         </v-card-actions>
       </v-form>
     </scroll-box>
 
-
-    <v-dialog
+    <select-exercise
+      v-if="lesson"
       v-model="dialogs.selectExercise"
-      persistent
-    >
-      <v-card class="pa-6">
-        <v-card-title
-          class="secondary--text font-weight-bold px-6"
-          v-text="text.selectExercise"
-        />
+      :title="text.selectExercise"
+      :lesson="lesson"
+      create
+      @canceled="clearLesson(true)"
+      @selected="setExercise"
+    />
 
-        <v-form
-          ref="exerciseForm"
-          class="pa-6 d-flex flex-column"
-          @submit.prevent
-          :disabled="loading.form"
-        >
-          <custom-input
-            class="pa-3"
-            v-model="exerciseForm.id"
-            label="エキササイズID"
-            :messages="['「exercise+数字」にしてください。数字がエキササイズの番号になります。（例） exercise1']"
-            :rules="[v => /^exercise\d$/.test(v) || '正しく入力してください']"
-            @input="selectExercise"
-          />
-
-          <custom-input
-            class="pa-3"
-            v-model="exerciseForm.title"
-            label="タイトル"
-            :messages="['エキササイズにタイトルをつけましょう。（例）print関数を使えるようになろう！']"
-            :counter="64"
-          />
-
-          <custom-input
-            class="pa-3"
-            input-type="select"
-            v-model="exerciseForm.quota"
-            label="正解ノルマ"
-            :messages="['正解ノルマ数を設定します']"
-            :items="[1, 2, 3, 4, 5]"
-          />
-        </v-form>
-
-        <v-card-actions>
-          <v-btn
-            color="grey"
-            text
-            @click="cancelExercise"
-            v-text="'キャンセル'"
-          />
-
-          <v-spacer />
-
-          <v-btn
-            class="font-weight-bold"
-            color="accent"
-            @click="submitExercise"
-            v-text="text.submitExercise"
-          />
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog
+    <select-lesson
       v-model="dialogs.selectLesson"
-      persistent
-    >
-      <v-card class="pa-6">
-        <v-card-title
-          class="secondary--text font-weight-bold px-6"
-          v-text="text.selectLesson"
-        />
-
-        <lessons-list
-          :lessons="lessons"
-          simple
-          @click:create="selectLesson()"
-          @click:lesson="selectLesson($event)"
-        />
-      </v-card>
-    </v-dialog>
+      :title="text.selectLesson"
+      @selected="setLesson"
+    />
   </page-wrapper>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import SelectLesson from '~/components/container/admin/SelectLesson'
+import SelectExercise from '~/components/container/admin/SelectExercise'
 import PageWrapper from '~/components/presentational/PageWrapper'
 import AppBar from '~/components/presentational/AppBar'
 import ScrollBox from '~/components/presentational/ScrollBox'
-import LessonsList from '~/components/presentational/LessonsList'
 import CustomInput from '~/components/presentational/CustomInput'
 import CodeInput from '~/components/presentational/CodeInput'
 import Markdown from '~/components/presentational/Markdown'
+import ExerciseBox from '~/components/presentational/ExerciseBox'
 export default {
   components: {
+    SelectLesson,
+    SelectExercise,
     PageWrapper,
     AppBar,
     ScrollBox,
-    LessonsList,
     CustomInput,
     CodeInput,
-    Markdown
+    Markdown,
+    ExerciseBox
   },
   data () {
     return {
-      // レッスン
+      loading: false,
       lesson: null,
-      // エキササイズ
-      exercise: {},
-      exerciseId: null,
-      exercises: [],
-      exerciseForm: {
-        id: 'exercise',
-        quota: 2,
-        title: null
+      exercise: null,
+      question: null,
+      dialogs: {
+        selectLesson: true,
+        selectExercise: false
       },
-      // 問題
-      question: {},
+      text: {
+        progree: 'progree',
+        title: '問題作成・編集',
+        selectLesson: 'レッスンを選択',
+        selectExercise: 'エキササイズを選択',
+        submitExercise: '作成して選択'
+      },
+      icons: {
+        edit: 'edit'
+      },
+      types: ['choices', 'writing', 'draganddrop', 'editing', 'coding'],
+      levels: [1, 2, 3],
+
+      confirmed: false,
       questionForm: {
         id: null,
         text: null,
@@ -264,50 +259,12 @@ export default {
         answerKeyCode: null,
         data: []
       },
-      types: [
-        {
-          id: 'choices',
-          title: '選択式'
-        },
-        {
-          id: 'writing',
-          title: '記述式'
-        },
-        {
-          id: 'draganddrop',
-          title: 'ドラッグ&ドロップ'
-        },
-        {
-          id: 'editing',
-          title: '間違い修正'
-        },
-        {
-          id: 'coding',
-          title: 'コーディング'
-        }
-      ],
-      levels: {
-        choices: null,
-        writing: null,
-        draganddrop: [1, 2, 3],
-        editing: [1, 2, 3],
-        coding: [1, 2, 3]
-      },
-
-      loading: { form: false },
-      icons: {
-        edit: 'edit'
-      },
-      text: {
-        progree: 'progree',
-        title: '問題作成・編集',
-        selectLesson: '問題の追加や編集を行うレッスンを選択',
-        selectExercise: 'エキササイズの追加',
-        submitExercise: '作成して選択'
-      },
-      dialogs: {
-        selectLesson: true,
-        selectExercise: false
+      dataItemTypes: {
+        choices: ['option', 'condition', 'hint'],
+        writing: ['condition', 'hint'],
+        draganddrop: ['option', 'format', 'hint'],
+        editing: ['code', 'hint'],
+        coding: ['code', 'hint']
       },
       markdowned: {
         sampleDescription: null
@@ -334,134 +291,71 @@ export default {
     }
   },
   methods: {
-    // エキササイズ
-    cancelExercise () {
-      this.exercise = {}
-      this.exerciseId = null
-      this.dialogs.selectExercise = false
-    },
-    async submitExercise () {
-      if (!this.$refs.exerciseForm.validate()) { return alert('正しく入力されていない欄があります。') }
-      const exercise = this.exercises.find(item => item.id === this.exerciseForm.id)
-      const exerciseIndex = (this.exerciseForm.id.match(/\d+/) || [])[0] || '?'
-      const newExercise = { ...this.exerciseForm, text: `Exercise ${exerciseIndex}` }
-      if (exercise) {
-        this.exercises = this.exercises.map(item => item.id !== exercise.id ? item : newExercise)
-      } else {
-        const newItem = this.exercises.pop()
-        this.exercises.push(newExercise, newItem)
-      }
-      await new Promise(resolve => { setTimeout(() => { resolve() }, 100) })
-      this.exercise = newExercise
-      this.exerciseId = newExercise.id
-      this.dialogs.selectExercise = false
-    },
-    selectExercise (event) {
-      if (event === 'new') {
-        this.exerciseForm = {
-          id: 'exercise',
-          quota: 2,
-          title: null
-        }
-        this.exercise = {}
-        this.dialogs.selectExercise = true
-      } else {
-        const exercise = this.exercises.find(item => item.id === event)
-        this.exerciseForm = {
-          id: event,
-          quota: exercise ? exercise.quota : 2,
-          title: exercise ? exercise.title : null
-        }
-        this.text.selectExercise = exercise ? 'エキササイズの編集' : 'エキササイズの追加'
-        this.text.submitExercise = exercise ? '編集して選択' : '作成して選択'
-        this.exercise = exercise
-        console.log(this.exercise)
-      }
-    },
     // レッスン
-    clearLesson (pass = false) {
+    async clearLesson (pass = false) {
       if (!pass) {
         const confirm = window.confirm('編集した内容が失われる可能性がありますが、別のレッスンにうつりますか？')
         if (!confirm) { return alert('キャンセルしました') }
       }
+      this.$router.push({ query: {} })
+      await new Promise(resolve => setTimeout(resolve, 200))
       this.lesson = null
-      this.form = {
-        id: null,
-        title: null,
-        rank: null,
-        nextLessonId: null,
-        prevLessonId: null,
-        sample: {
-          code: null,
-          description: null
-        },
-        slides: [],
-        exercises: {}
-      }
       this.dialogs.selectLesson = true
     },
-    selectLesson (lesson = {}) {
+    setLesson (lesson) {
       this.lesson = lesson
-      this.form = {
-        ...this.lesson,
-        exercises: { ...this.lesson.exercises }
-      }
-      this.exercises = Object.keys(this.lesson.exercises).sort().map(exerciseId => {
-        const exerciseIndex = (exerciseId.match(/\d+/) || [])[0] || '?'
-        return {
-          id: exerciseId,
-          text: `Exercise ${exerciseIndex}`,
-          quota: this.lesson.exercises[exerciseId].quota,
-          title: this.lesson.exercises[exerciseId].title
-        }
-      })
-      this.exercises.push({ id: 'new', text: '新しいエキササイズ' })
-      this.exercises.unshift({ id: null, text: '------------' })
+      this.dialogs.selectExercise = true
       this.dialogs.selectLesson = false
     },
-
-    inputMarkdown (name) {
-      this.questionForm[`_${name}`] = (this.questionForm.description || '').replace(/\n/g, '\\\\n')
+    // エキササイズ
+    setExercise (exercise) {
+      this.exercise = exercise
+      this.dialogs.selectExercise = false
+      const questionId = this.$route.query.question || this.$uuid()
+      this.setQuestion(questionId)
     },
-
+    // クエスチョン
+    setQuestion (questionId) {
+      const question = (this.exercise.questions || []).find(question => question.id === questionId)
+      this.question = question ? JSON.parse(JSON.stringify(question)) : { id: questionId }
+      this.question = {
+        ...this.question,
+        text: (this.question.text || '').replace(/\\\\n/g, '\n'),
+        data: (this.question.data || []).map(item => ({ ...item, text: item.text.replace(/\\\\n/g, '\n') }))
+      }
+    },
+    async confirm () {
+      if (!this.$refs.questionForm.validate()) {
+        return alert('正しく入力されていない欄があります。')
+      }
+      this.loading = true
+      this.confirmed = false
+      await new Promise(resolve => setTimeout(resolve, 200))
+      this.loading = false
+      this.confirmed = true
+    },
     async submit () {
-      if (!this.$refs.form.validate()) { return alert('正しく入力されていない欄があります。') }
-      const confirm = window.confirm('保存するとデータが書き換えられますが、よろしいですか？')
+      const confirm = window.confirm('問題を追加・編集完了し、保存します。')
       if (!confirm) { return alert('キャンセルしました') }
-      const prevLesson = this.lessons.find(lesson => lesson.id === this.form.prevLessonId)
-      const nextLesson = this.lessons.find(lesson => lesson.id === this.form.nextLessonId)
-      if (prevLesson && nextLesson && prevLesson.rank >= nextLesson.rank) {
-        return alert('前後関係が矛盾しています')
-      }
-      this.loading.form = true
-      const lessonIndex = (this.form.title.match(/(\d|\.)+/) || [])[0] || '999'
-      this.form.rank = Number(lessonIndex)
-      if (prevLesson && prevLesson.nextLessonId !== this.form.id) {
-        const prevLessonData = { ...prevLesson, nextLessonId: this.form.id }
-        const prevConfirm = window.confirm('前のレッスンの次のレッスンをこのレッスンに書き換えます、よろしいですか？')
-        if (prevConfirm) {
-          await this.setLessons(prevLessonData)
+      this.loading = true
+      const questions = (this.exercise.questions || []).filter(item => item.id !== this.question.id)
+      const question = JSON.parse(JSON.stringify(this.question))
+      question.text = question.text.replace(/\n/g, '\\\\n')
+      question.data = question.data.map(item => ({ ...item, text: item.text.replace(/\n/g, '\\\\n') }))
+      await this.setLessons({
+        id: this.lesson.id,
+        merge: true,
+        exercises: {
+          [this.exercise.id]: {
+            ...this.exercise,
+            questions: [
+              ...questions,
+              question
+            ]
+          }
         }
-      }
-      if (nextLesson && nextLesson.prevLessonId !== this.form.id) {
-        const nextLessonData = { ...nextLesson, prevLessonId: this.form.id }
-        const nextConfirm = window.confirm('次のレッスンの前のレッスンをこのレッスンに書き換えます、よろしいですか？')
-        if (nextConfirm) {
-          await this.setLessons(nextLessonData)
-        }
-      }
-      const slides = []
-      for (const slide of this.form.slides) {
-        if (slide.file) {
-          const imageUrl = await this.uploadFile(slide.file)
-          slides.push({ id: slide.id, imageUrl })
-        } else {
-          slides.push({ ...slide })
-        }
-      }
-      this.form.slides = slides
-      await this.setLessons(this.form)
-      this.loading.form = false
+      })
+      this.loading = false
       alert('完了しました')
       this.clearLesson(true)
     },
@@ -469,7 +363,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['user']),
-    ...mapGetters('data', ['lessons'])
+    ...mapGetters('data', ['lessons', 'theLesson'])
   }
 }
 </script>
