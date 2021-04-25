@@ -48,16 +48,17 @@
           :items="types"
         />
 
-        <custom-input
-          v-if="question.type && /(draganddrop|editing|coding)/.test(question.type)"
-          class="pa-3"
-          input-type="select"
-          v-model="question.level"
-          label="レベル"
-          :messages="['問題のレベルを設定します']"
-          :rules="[v => !!v || '選択してください']"
-          :items="levels"
-        />
+        <div v-if="question.type && /(draganddrop|editing|coding)/.test(question.type)">
+            <custom-input
+              class="pa-3"
+              input-type="select"
+              v-model="question.level"
+              label="レベル"
+              :messages="['問題のレベルを設定します']"
+              :rules="[v => !!v || '選択してください']"
+              :items="levels"
+            />
+        </div>
 
         <v-divider class="my-6" />
 

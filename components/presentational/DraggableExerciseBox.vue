@@ -73,7 +73,7 @@ export default {
   fetch () {
     const formatItem = this.question.data.find(e => e.type === 'format')
     let row = 0
-    let keyNumber = 0
+    let keyNumber = 1
     this.format = formatItem.text
       .replace(/\s/g, '<span style="padding-right: 9px !important;"></span>')
       .replace(/^/g, `<div class="d-flex align-center"><span class="text--secondary" style="padding-right: 24px !important;">${++row}</span>`)
@@ -177,6 +177,7 @@ export default {
           answer += this.result[resultId]
         }
       }
+      console.log(answer)
       this.$emit('submit', answer)
     }
   }

@@ -184,8 +184,7 @@ export default {
       })
       // 判定終了
       this.isCorrect = isCorrect
-      // 間違っていたら問題を読み込む（書いたコードを入力させておくため）
-      if (!isCorrect) { this.$fetch() }
+      this.lastCode = code || ''
       this.loading = false
     },
     async nextQuestion (exercise = this.exercise) {
