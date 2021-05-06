@@ -7,44 +7,50 @@
     >
       <v-card-title
         class="font-weight-bold text-h4 justify-center mb-6"
-        v-text="title"
+        v-text="text.title"
       />
+
       <v-card-subtitle
         class="text-center pb-0"
-        v-text="subtitle"
+        v-text="text.subtitle"
       />
+
       <v-form
         ref="signForm"
         class="px-4 pb-4"
         :disabled="loading"
+        @submit.prevent
       >
         <v-text-field
-          v-model="form.email"
+          v-model="email"
           class="pb-1"
           hide-details="auto"
           color="primary"
-          :label="labels.email"
+          :label="text.email"
           :rules="[rules.email]"
         />
+
         <v-text-field
-          v-model="form.password"
+          v-model="pwd"
           hide-details="auto"
           color="primary"
-          :label="labels.password"
-          :type="form.passwordVisible ? 'text' : 'password'"
-          :append-icon="form.passwordVisible ? 'visibility' : 'visibility_off'"
-          :rules="[rules.password]"
-          @click:append="form.passwordVisible = !form.passwordVisible"
+          :label="text.pwd"
+          :rules="[rules.pwd]"
+          :type="pwdVisible ? 'text' : 'password'"
+          :append-icon="pwdVisible ? 'visibility' : 'visibility_off'"
+          @click:append="pwdVisible = !pwdVisible"
         />
       </v-form>
+
       <v-card-actions class="pa-4">
         <v-spacer />
+
         <v-btn
           color="primary"
-          outlined
           :disabled="loading"
-          @click="submitLogin"
-          v-text="buttonText"
+          outlined
+          @click="submit"
+          v-text="text.start"
         />
         <v-spacer />
       </v-card-actions>
@@ -57,42 +63,46 @@ import { mapActions, mapGetters } from 'vuex'
 export default {
   async middleware (context) {
     if (context.store.getters['auth/isAuthenticated']) {
-      return context.redirect({ path: '/' })
+      return context.redirect({
+        path: '/'
+      })
     }
   },
   head () {
     return {
-      title: 'ログイン'
+      title: 'ログイン | progree'
     }
   },
   data () {
-    const emailReg = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/
-    const passwordReg = /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9]{8,20}$/
     return {
-      title: 'progree',
-      subtitle: '最初にログインしてください',
-      loading: false,
-      form: {
-        email: null,
-        password: null,
-        passwordVisible: false
-      },
-      labels: {
+      text: {
+        title: 'progree',
+        subtitle: '最初にログインしてください',
         email: 'ログインID',
-        password: 'パスワード'
+        pwd: 'パスワード',
+        inputValidEmail: 'ログインIDを正しく入力してください',
+        inputValidPwd: 'パスワードは 8 ~ 20 文字の半角英数字です',
+        start: 'ログインしてはじめる'
       },
+      loading: false,
+      email: null,
+      pwd: null,
+      pwdVisible: false,
       rules: {
-        email: value => emailReg.test(value) || 'ログインIDを正しく入力してください',
-        password: value => passwordReg.test(value) || 'パスワードは 8 ~ 20 文字の半角英数字です'
-      },
-      buttonText: 'ログインしてはじめる'
+        email: v => this.$regexp.email.test(v) || this.text.inputValidEmail,
+        pwd: v => this.$regexp.pwd.test(v) || this.text.inputValidPwd
+      }
     }
   },
   methods: {
-    async submitLogin () {
-      if (!this.$refs.signForm.validate()) { return }
-      this.loading = true
-      await this.login(this.form)
+    async submit () {
+      if (this.$refs.signForm.validate()) {
+        this.loading = true
+        await this.login({
+          email: this.email,
+          password: this.pwd
+        })
+      }
     },
     ...mapActions('auth', ['login'])
   },
@@ -100,13 +110,17 @@ export default {
     isAuthenticated () {
       if (this.isAuthenticated) {
         this.loading = false
-        const next = this.$route.query?.next
-        return this.$router.push({ path: next || '/' })
+        return this.$router.push({
+          path: this.$route.query?.next || '/'
+        })
       }
     }
   },
   computed: {
-    ...mapGetters('auth', ['user', 'isAuthenticated'])
+    ...mapGetters('auth', [
+      'user',
+      'isAuthenticated'
+    ])
   }
 }
 </script>

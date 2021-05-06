@@ -1,14 +1,23 @@
 <template>
   <div class="d-flex flex-wrap">
     <v-card
-      class="pa-6"
-      style="overflow: auto;"
-      max-height="410"
-      :width="isMobile ? '100%' : '40%'"
-      :max-width="isMobile ? '100%' : '40%'"
+      class="pa-2"
+      :class="{ 'mr-3': !isMobile, 'mb-3': isMobile }"
+      style="overflow: auto; border-radius: 4px; border: 1px solid #419eb2;"
+      max-height="430"
+      :width="isMobile ? '100%' : 'calc(40% - 18px)'"
+      :max-width="isMobile ? '100%' : 'calc(40% - 18px)'"
       flat
     >
-      <markdown :text="description" />
+      <v-card-title
+        class="font-weight-bold"
+        v-text="text.title"
+      />
+
+      <markdown
+        class="px-4"
+        :text="lesson.sample.description"
+      />
     </v-card>
 
     <v-card
@@ -17,10 +26,11 @@
       :width="isMobile ? '100%' : '60%'"
       :max-width="isMobile ? '100%' : '60%'"
       dark
+      flat
     >
       <v-card-title
         class="body-2 font-weight-bold py-1"
-        v-text="text.title"
+        v-text="text.editor"
       />
 
       <div
@@ -85,23 +95,19 @@ import ace from 'brace'
 import 'brace/mode/python'
 import 'brace/theme/clouds'
 import '~/plugins/theme/clouds_onlyread'
-import Markdown from '~/components/presentational/Markdown'
 export default {
-  components: { Markdown },
   props: {
-    description: {
-      type: String,
-      default: null
-    },
-    code: {
-      type: String,
-      default: null
+    lesson: {
+      type: Object,
+      default: () => ({})
     }
   },
   data () {
     return {
+      code: this.lesson.sample.code,
       text: {
-        title: 'Python コードエディター',
+        title: 'サンプルコード',
+        editor: 'Python コードエディター',
         reset: 'リセット',
         edit: 'コードを書き換える',
         save: '保存',

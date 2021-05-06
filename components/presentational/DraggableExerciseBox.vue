@@ -177,7 +177,6 @@ export default {
           answer += this.result[resultId]
         }
       }
-      console.log(answer)
       this.$emit('submit', answer)
     }
   }

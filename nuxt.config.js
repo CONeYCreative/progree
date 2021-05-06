@@ -2,12 +2,21 @@ export default {
   ssr: false,
   target: 'static',
   head: {
-    titleTemplate: '%s | progree',
     title: 'progree',
     link: [
-      { rel: 'preconnect', href: 'https://fonts.gstatic.com' },
-      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap' },
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com'
+      },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap'
+      },
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
+        href: '/favicon.ico'
+      }
     ]
   },
   css: [
@@ -20,22 +29,36 @@ export default {
     '~/plugins/helpers',
     '~/plugins/firebase'
   ],
-  components: true,
+  components: [
+    '~/components',
+    {
+      path: '~/components/container/',
+      prefix: ''
+    },
+    {
+      path: '~/components/presentational/',
+      prefix: ''
+    }
+  ],
   buildModules: [
-    '@nuxtjs/vuetify'
+    '@nuxtjs/vuetify',
+    '@nuxt/components'
   ],
   modules: [
     "@nuxtjs/axios",
     '@nuxtjs/pwa'
   ],
   pwa: {
-    manifest: { lang: 'ja' }
+    manifest: {
+      lang: 'ja'
+    }
   },
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
-    icons: { iconfont: ['mdi', 'md', 'fa'] },
+    icons: {
+      iconfont: ['mdi', 'md', 'fa']
+    },
     theme: {
-      dark: false,
       themes: {
         light: {
           primary: '#419eb2',

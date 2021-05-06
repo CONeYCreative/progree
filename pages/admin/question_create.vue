@@ -1,22 +1,33 @@
 <template>
-  <question-create-page />
+  <admin-question-create-page />
 </template>
 
 <script>
-import QuestionCreatePage from '~/components/container/admin/QuestionCreatePage'
 export default {
-  components: { QuestionCreatePage },
   async middleware (context) {
     // 認証確認
-    if (!context.store.getters['auth/isAuthenticated']) {
-      return context.redirect({ path: '/login/', query: { next: context.route.path } })
+    const user = context.store.getters['auth/user']
+    if (!user?.uid) {
+      context.redirect({
+        path: '/login/',
+        query: {
+          next: context.route.path
+        }
+      })
+      return
+    }
+    if (!user?.isAdmin) {
+      context.redirect({
+        path: '/'
+      })
+      return
     }
     // レッスン取得
     await context.store.dispatch('data/fetchLessons')
   },
   head () {
     return {
-      title: '問題作成・編集'
+      title: '問題作成・編集 | progree'
     }
   }
 }

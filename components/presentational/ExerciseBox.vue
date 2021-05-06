@@ -1,8 +1,10 @@
 <template>
   <div class="d-flex flex-wrap">
     <v-card
-      :width="isMobile ? '100%' : '40%'"
-      :max-width="isMobile ? '100%' : '40%'"
+      class="exercise-box__desc pa-2"
+      :class="{ 'mr-3': !isMobile, 'mb-3': isMobile }"
+      :width="isMobile ? '100%' : 'calc(40% - 18px)'"
+      :max-width="isMobile ? '100%' : 'calc(40% - 18px)'"
       flat
     >
       <v-card-title v-text="text.title" />
@@ -10,11 +12,21 @@
       <v-card-text v-text="text[question.type]" />
 
       <markdown
-        class="pa-4"
-        :class="{ 'mr-3': !isMobile }"
-        style="border-radius: 4px; border: 1px solid #419eb2;"
+        class="px-4"
         :text="question.text"
       />
+
+      <v-card-actions v-if="hint">
+        <v-spacer />
+
+        <v-btn
+          class="font-weight-bold"
+          color="accent"
+          small
+          @click="showHint"
+          v-text="text.hint"
+        />
+      </v-card-actions>
     </v-card>
 
     <v-card
@@ -26,7 +38,7 @@
       <editable-exercise-box
         :code="code"
         :last-code="lastCode"
-        @answer="$emit('answer', $event)"
+        @answer="submitAnswer($event)"
       />
     </v-card>
 
@@ -36,6 +48,7 @@
       style="border: 1px solid #419eb2;"
       :width="isMobile ? '100%' : '60%'"
       :max-width="isMobile ? '100%' : '60%'"
+      flat
     >
       <v-card-title
         v-if="/(draganddrop|choices)/.test(question.type)"
@@ -79,46 +92,57 @@
         <v-card
           v-for="option of options"
           :key="option.id"
-          class="px-3 mb-3"
+          class="pa-3 mb-3 d-flex align-center"
+          :ripple="false"
           light
           flat
+          @click="answer = option.id"
         >
-          <v-radio :value="option.id">
-            <template #label>
-              <markdown
-                class="markdown--options"
-                :text="option.text"
-              />
-            </template>
-          </v-radio>
+          <v-radio
+            class="mb-0"
+            :value="option.id"
+            :ripple="false"
+          />
+
+          <markdown
+            class="markdown--options"
+            :text="option.text"
+          />
         </v-card>
       </v-radio-group>
 
       <v-card-actions class="pa-2">
         <v-spacer />
+
         <v-btn
           class="font-weight-bold"
           color="accent"
           :disabled="!answer"
           small
-          @click="$emit('answer', { answer })"
+          @click="submitAnswer({ answer })"
           v-text="text.submit"
         />
       </v-card-actions>
     </v-card>
+
+    <hint-dialog
+      v-model="dialogs.hint"
+      :hint="hint"
+    />
+
+    <answer-dialog
+      v-model="dialogs.answer"
+      :answer="answer"
+      :code="answerCode"
+      :question="question"
+      @answer="$emit('answer', $event)"
+      @next="$emit('next', $event)"
+    />
   </div>
 </template>
 
 <script>
-import Markdown from '~/components/presentational/Markdown'
-import EditableExerciseBox from '~/components/presentational/EditableExerciseBox'
-import DraggableExerciseBox from '~/components/presentational/DraggableExerciseBox'
 export default {
-  components: {
-    Markdown,
-    EditableExerciseBox,
-    DraggableExerciseBox
-  },
   props: {
     question: {
       type: Object,
@@ -135,6 +159,19 @@ export default {
   },
   data () {
     return {
+      loading: false,
+      code: null,
+      hint: null,
+      options: null,
+      conditions: null,
+      isHintShowed: false,
+      isCorrect: false,
+      answer: null,
+      answerCode: null,
+      dialogs: {
+        hint: false,
+        answer: false
+      },
       text: {
         title: 'Question',
         submit: '回答する',
@@ -143,21 +180,19 @@ export default {
         writing: '適切な答えを入力してください！',
         editing: 'エディタ内のコードを訂正してください！',
         coding: '条件に従ってコードを作成してください！',
-        input: '答えを入力'
-      },
-      code: null,
-      options: null,
-      conditions: null,
-      answer: null
+        input: '答えを入力',
+        confirmHint: 'ヒントを表示してもよろしいですか？',
+        hint: 'ヒント'
+      }
     }
   },
   fetch () {
     this.text.title += ` ${this.clearedQuestionNumber}`
-    this.options = this.question.data.filter(e => e.type === 'option')
-    this.options = this.shuffleArray(this.options)
-    console.log(this.options)
-    this.conditions = this.question.data.filter(e => e.type === 'condition')
-    this.code = this.question.data.find(e => e.type === 'code')?.text || ''
+    const data = this.question.data
+    this.options = this.shuffleArray(data.filter(e => e.type === 'option'))
+    this.conditions = data.filter(e => e.type === 'condition')
+    this.code = data.find(e => e.type === 'code')?.text || ''
+    this.hint = data.find(e => e.type === 'hint')?.text || ''
   },
   methods: {
     shuffleArray (input) {
@@ -169,6 +204,16 @@ export default {
         array[i] = clone[j]
       }
       return array
+    },
+    showHint () {
+      const confirm = window.confirm(this.text.confirmHint)
+      this.dialogs.hint = confirm
+      this.isHintShowed = true
+    },
+    async submitAnswer (answerObj) {
+      this.answer = answerObj.answer
+      this.answerCode = answerObj.code
+      this.dialogs.answer = true
     }
   },
   computed: {
@@ -183,5 +228,10 @@ export default {
 <style>
 .markdown--options p {
   margin-bottom: 0 !important;
+}
+.exercise-box__desc {
+  border: 1px solid #419eb2 !important;
+  border-radius: 4px;
+  overflow: auto;
 }
 </style>

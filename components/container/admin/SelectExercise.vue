@@ -17,7 +17,7 @@
         <custom-input
           class="pa-3"
           input-type="select"
-          label="エキササイズ"
+          label="エクササイズ"
           item-value="id"
           item-text="id"
           :items="exercises"
@@ -151,7 +151,7 @@ export default {
         return
       }
     }
-    // 指定されたレッスンのエキササイズ一覧を作成
+    // 指定されたレッスンのエクササイズ一覧を作成
     const exerciseIds = Object.keys(this.lesson.exercises || {}).sort()
     this.exercises = exerciseIds.map(exerciseId => {
       const exercise = this.lesson.exercises[exerciseId]
@@ -159,22 +159,22 @@ export default {
       return { id: exerciseId, ...clone }
     })
     this.exercises.unshift({ id: '' })
-    // エキササイズの追加が許可されている時
+    // エクササイズの追加が許可されている時
     if (this.create) {
-      // 追加可能なエキササイズのIDリストを作成
+      // 追加可能なエクササイズのIDリストを作成
       for (const exercise of this.exercises) {
         if (exercise.id) {
           this.exerciseIds = this.exerciseIds.filter(item => item !== exercise.id)
         }
       }
       if (!!this.exerciseIds.length) {
-        this.exercises.push({ id: 'エキササイズを追加' })
+        this.exercises.push({ id: 'エクササイズを追加' })
       }
     }
   },
   methods: {
     changeExercise (exerciseId) {
-      this.formActive = exerciseId === 'エキササイズを追加'
+      this.formActive = exerciseId === 'エクササイズを追加'
       const exercise = this.exercises.find(exercise => exercise.id === exerciseId)
       this.exercise = exercise && !this.formActive ? exercise : {}
       this.updatable = !!this.exercise.id

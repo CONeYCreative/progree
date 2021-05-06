@@ -180,7 +180,6 @@ export default {
     }
   },
   fetch () {
-    console.log(this.lessons)
     this.progress.forEach(p => {
       this.progressObject[p.id] = p
     })

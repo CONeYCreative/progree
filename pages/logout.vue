@@ -1,10 +1,13 @@
 <script>
 export default {
   async middleware (context) {
-    if (context.store.getters['auth/isAuthenticated']) {
+    const auth = context.store.getters['auth/isAuthenticated']
+    if (auth) {
       await context.store.dispatch('auth/logout')
     }
-    return context.redirect({ path: '/login/' })
+    context.redirect({
+      path: '/login/'
+    })
   }
 }
 </script>

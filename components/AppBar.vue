@@ -11,21 +11,22 @@
         v-text="title"
         @click="$emit('click: title')"
       />
+
       <v-spacer />
+
       <nav-menu
         v-if="!!navMenuItems.length"
         :user="user"
         :items="navMenuItems"
       />
     </v-app-bar>
+
     <div style="height: 56px;" />
   </div>
 </template>
 
 <script>
-import NavMenu from '~/components/presentational/NavMenu'
 export default {
-  components: { NavMenu },
   props: {
     icon: {
       type: String,

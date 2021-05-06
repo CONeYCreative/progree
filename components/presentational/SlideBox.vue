@@ -1,15 +1,16 @@
 <template>
-  <v-card
+  <v-responsive
     class="ma-auto"
     max-width="1100"
+    :aspect-ratio="2"
   >
     <v-carousel
-      class="slide-box"
       v-model="model"
+      style="position: absolute;"
       id="slideBox"
+      class="slide-box"
+      height="auto"
       :continuous="false"
-      hide-delimiter-background
-      hide-delimiters
     >
       <template #prev="{ on, attrs }">
         <v-btn
@@ -24,7 +25,7 @@
             color="primary"
             right
             large
-            v-text="icons.prev"
+            v-text="prevIcon"
           />
         </v-btn>
       </template>
@@ -43,21 +44,21 @@
             color="primary"
             right
             large
-            v-text="icons.next"
+            v-text="nextIcon"
           />
         </v-btn>
       </template>
 
       <v-carousel-item
-        v-for="(slide, i) of lesson.slides"
-        :key="i"
+        v-for="slide of lesson.slides"
+        :key="slide.title"
         :src="slide.imageUrl"
         :ripple="false"
         eager
         @click="$emit('click:slide', slide)"
       />
     </v-carousel>
-  </v-card>
+  </v-responsive>
 </template>
 
 <script>
@@ -75,10 +76,8 @@ export default {
   data () {
     return {
       model: false,
-      icons: {
-        prev: 'arrow_back_ios',
-        next: 'arrow_forward_ios'
-      }
+      prevIcon: 'arrow_back_ios',
+      nextIcon: 'arrow_forward_ios'
     }
   },
   fetch () {

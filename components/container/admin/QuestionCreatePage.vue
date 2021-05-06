@@ -20,7 +20,7 @@
 
         <v-btn
           text
-          v-text="'レッスン・エキササイズを再選択'"
+          v-text="'レッスン・エクササイズを再選択'"
           @click="clearLesson(false)"
         />
       </div>
@@ -209,7 +209,6 @@ import { mapActions, mapGetters } from 'vuex'
 import SelectLesson from '~/components/container/admin/SelectLesson'
 import SelectExercise from '~/components/container/admin/SelectExercise'
 import PageWrapper from '~/components/presentational/PageWrapper'
-import AppBar from '~/components/presentational/AppBar'
 import ScrollBox from '~/components/presentational/ScrollBox'
 import CustomInput from '~/components/presentational/CustomInput'
 import CodeInput from '~/components/presentational/CodeInput'
@@ -220,7 +219,6 @@ export default {
     SelectLesson,
     SelectExercise,
     PageWrapper,
-    AppBar,
     ScrollBox,
     CustomInput,
     CodeInput,
@@ -241,7 +239,7 @@ export default {
         progree: 'progree',
         title: '問題作成・編集',
         selectLesson: 'レッスンを選択',
-        selectExercise: 'エキササイズを選択',
+        selectExercise: 'エクササイズを選択',
         submitExercise: '作成して選択'
       },
       icons: {
@@ -308,7 +306,7 @@ export default {
       this.dialogs.selectExercise = true
       this.dialogs.selectLesson = false
     },
-    // エキササイズ
+    // エクササイズ
     setExercise (exercise) {
       this.exercise = exercise
       this.dialogs.selectExercise = false

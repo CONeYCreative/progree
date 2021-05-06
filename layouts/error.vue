@@ -6,23 +6,20 @@
     >
       <v-card
         min-width="300"
+        max-width="600"
         class="primary--text"
         light
       >
         <v-card-title v-text="title" />
+
         <v-card-subtitle v-text="subtitle" />
+
         <v-card-actions>
           <v-btn
             color="primary"
-            text
+            block
             @click="goBack"
-            v-text="'キャンセル'"
-          />
-          <v-spacer />
-          <v-btn
-            color="primary"
-            @click="$router.go({ path: $router.currentRoute.path , force: true })"
-            v-text="'OK'"
+            v-text="back"
           />
         </v-card-actions>
       </v-card>
@@ -41,31 +38,39 @@ export default {
   data () {
     return {
       title: null,
-      subtitle: null
+      subtitle: null,
+      notFound: '404 Not Found.',
+      notFoundMessage: 'ページが見つかりませんでした。',
+      internalServerError: '500 Internal Server Error.',
+      internalServerErrorMessage: 'エラーが発生しました。',
+      back: '戻る'
     }
   },
   created () {
-    this.title = `${this.error.statusCode}`
-    this.subtitle = this.error.message
+    if (this.error.statusCode === 404) {
+      this.title = this.notFound
+      this.subtitle = this.notFoundMessage
+    } else {
+      this.title = this.error.statusCode || this.internalServerError
+      this.subtitle = this.error.message || this.internalServerErrorMessage
+    }
   },
   head () {
     return {
-      title: this.title,
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: this.subtitle
-        }
-      ]
+      title: this.title
     }
   },
   methods: {
     goBack () {
-      if (this.$nuxt.context.from.name === this.$router.currentRoute.name) {
-        this.$router.go({ path: '/' , force: true })
-      } else {
+      if (this.error.statusCode === 404) {
         this.$router.go(-1)
+        return
+      }
+      const nextLocation = this.error.next || this.$nuxt.context.from || { path: '/' }
+      const toSamePage = nextLocation.path === this.$route.path
+      this.$router.push(nextLocation)
+      if (toSamePage) {
+        this.$router.go(0)
       }
     }
   }

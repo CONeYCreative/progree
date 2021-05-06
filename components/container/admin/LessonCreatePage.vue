@@ -224,7 +224,6 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import PageWrapper from '~/components/presentational/PageWrapper'
-import AppBar from '~/components/presentational/AppBar'
 import ScrollBox from '~/components/presentational/ScrollBox'
 import LessonsList from '~/components/presentational/LessonsList'
 import CustomInput from '~/components/presentational/CustomInput'
@@ -234,7 +233,6 @@ import SlideBox from '~/components/presentational/SlideBox'
 export default {
   components: {
     PageWrapper,
-    AppBar,
     ScrollBox,
     LessonsList,
     CustomInput,

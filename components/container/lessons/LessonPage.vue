@@ -3,7 +3,7 @@
     <app-bar
       :title="text.title"
       :user="user"
-      :navMenuItems="navMenuItems"
+      :navMenuItems="navMenuItems.filter(item => !item.admin || user.isAdmin)"
     />
 
     <v-card
@@ -70,16 +70,16 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import PageWrapper from '~/components/presentational/PageWrapper'
-import AppBar from '~/components/presentational/AppBar'
-import SectionMenu from '~/components/presentational/SectionMenu'
 export default {
-  components: {
-    PageWrapper,
-    AppBar,
-    SectionMenu
-  },
   props: {
+    lesson: {
+      type: Object,
+      default: () => ({})
+    },
+    progress: {
+      type: Object,
+      default: () => ({})
+    },
     titleIcon: {
       type: String,
       default: null
@@ -108,8 +108,6 @@ export default {
   data () {
     return {
       text: { title: 'progree' },
-      lesson: null,
-      progress: null,
       sectionMenuItems: [],
       navMenuItems: [
         {
@@ -121,21 +119,17 @@ export default {
           icon: 'logout',
           text: 'ログアウト',
           location: '/logout/'
+        },
+        {
+          icon: 'person',
+          text: '管理者ページ',
+          location: '/admin/',
+          admin: true
         }
       ]
     }
   },
   async fetch () {
-    if (this.user.isAdmin) {
-      this.navMenuItems.push({
-        icon: 'person',
-        text: '管理者ページ',
-        location: '/admin/'
-      })
-    }
-    const lessonId = this.$route.params.lessonId
-    this.lesson = this.$store.getters['data/theLesson'](lessonId)
-    this.progress = this.$store.getters['data/theProgress'](lessonId) || {}
     this.sectionMenuItems = this.buildSectionMenu(this.lesson)
     await this.setProgress({
       id: this.lesson.id,
@@ -153,7 +147,7 @@ export default {
         menuItems.push({
           text: slide.title,
           location: {
-            path: `/lessons/${lesson.id}/`,
+            path: `/lessons/${lesson.id}/slide/`,
             hash: `slide${index}`
           }
         })
@@ -163,7 +157,7 @@ export default {
           {
             divider: true,
             text: 'サンプルコード',
-            location: { path: `/lessons/${lesson.id}/code/` }
+            location: `/lessons/${lesson.id}/code/`
           }
         )
       }
@@ -171,8 +165,8 @@ export default {
         menuItems.push(
           {
             divider: true,
-            text: 'エキササイズ',
-            location: { path: `/lessons/${lesson.id}/exercise/` }
+            text: 'エクササイズ',
+            location: `/lessons/${lesson.id}/exercise/`
           }
         )
       }

@@ -21,7 +21,7 @@
           height="90"
           width="280"
           dark
-          @click="$router.push({ path: item.path })"
+          @click="$router.push(item.path)"
         >
           <v-icon
             class="mx-3"
@@ -40,12 +40,10 @@
 <script>
 import { mapGetters } from 'vuex'
 import PageWrapper from '~/components/presentational/PageWrapper'
-import AppBar from '~/components/presentational/AppBar'
 import ScrollBox from '~/components/presentational/ScrollBox'
 export default {
   components: {
     PageWrapper,
-    AppBar,
     ScrollBox
   },
   data () {

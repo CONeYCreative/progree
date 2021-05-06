@@ -28,7 +28,7 @@ export default {
         id: [ // スタートしたタイムスタンプをIDに
           {
             answeredAt: DateTime, // 回答日時
-            exerciseId: String, // エキササイズID
+            exerciseId: String, // エクササイズID
             questionId: String, // 問題ID
             code: String, // 回答コード
             answer: String, // 回答
